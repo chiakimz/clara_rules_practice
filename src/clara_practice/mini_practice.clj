@@ -40,7 +40,7 @@
   =>
   (insert-all! [(->Documents ?name :turnover)
                 (->Documents ?name :bank-statement)
-                (->Documents ?name :loan-amount-requested)]))
+                (->Documents ?name :valid-loan-amount-requested)]))
 
 (defrule need-to-submit-four-documents
   [BusinessOwner (= ?name name)]
