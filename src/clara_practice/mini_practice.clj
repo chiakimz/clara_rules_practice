@@ -10,7 +10,7 @@
 
 (defrecord NotEligible [name])
 
-(defrecord Documents [name doc])
+(defrecord Document [name doc])
 
 (defrecord SubmittedAllDocuments [name amount])
 
@@ -38,13 +38,13 @@
   their initial details are automatically provided"
   [BusinessOwner (= ?name name) (= through-broker true)]
   =>
-  (insert-all! [(->Documents ?name :turnover)
-                (->Documents ?name :bank-statement)
-                (->Documents ?name :valid-loan-amount-requested)]))
+  (insert-all! [(->Document ?name :turnover)
+                (->Document ?name :bank-statement)
+                (->Document ?name :valid-loan-amount-requested)]))
 
 (defrule need-to-submit-four-documents
   [BusinessOwner (= ?name name)]
-  [?c <- (acc/count) from (Documents (= ?name name))]
+  [?c <- (acc/count) from (Document (= ?name name))]
   [:test (> ?c 3)]
   =>
   (insert! (->SubmittedAllDocuments ?name ?c)))
