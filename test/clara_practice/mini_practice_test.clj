@@ -21,7 +21,7 @@
   (let [session (mk-session 'clara-practice.mini-practice) with-facts (reduce insert session facts)]
     (fire-rules with-facts)))
 
-(defn eligible [result]
+(defn eligibles [result]
   (map :?eligible result))
 
 (deftest old-corner-shop-test
@@ -49,6 +49,16 @@
           result (query session eligible?)]
       (is (empty? result))))
 
-  (testing "only done 3 chores is not good enough"))
+  (testing "multiple business owners"
+    (let [facts (derive-facts-from [{:name "Franz Ferdinand" :through-broker true :docs [:no-exposure]} {:name "Winston Churchill" :docs [:turnover :valid-loan-amount-requested :no-exposure :owner-id-provided]}])
+          session (create-session-with facts)
+          result (query session eligible?)]
+      (is (= (eligibles result) (list (->Eligible "Franz Ferdinand") (->Eligible "Winston Churchill"))))))
+
+  (testing "only submitting 3 docs is not good enough"
+    (let [facts (derive-facts-from [{:name "Alexander the Great" :docs [:valid-loan-amount-requested :turnover :owner-id-provided]}])
+          session (create-session-with facts)
+          result (query session eligible?)]
+      (is (empty? result)))))
 
 
