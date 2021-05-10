@@ -25,12 +25,6 @@
   (map :?eligible result))
 
 (deftest old-corner-shop-test
-  (testing "that a dormant business is automatically not eligible"
-    (let [facts (derive-facts-from [{:name "John Doe" :is-dormant true}])
-          session (create-session-with facts)
-          [{result :?not-eligible}] (query session not-eligible-query?)]
-      (is (= result (->NotEligible "John Doe")))))
-
   (testing "submitting 4 documents makes you eligible"
     (let [facts (derive-facts-from [{:name "Adam Smith" :docs [:valid-loan-amount-requested :no-exposure :owner-id-provided :bank-statement]}])
           session (create-session-with facts)
@@ -42,6 +36,12 @@
           session (create-session-with facts)
           [{result :?eligible}] (query session eligible?)]
       (is (= result (->Eligible "Sigmund Freud")))))
+
+  (testing "coming through a broker but lacks docs"
+    (let [facts (derive-facts-from [{:name "Sigmund Freud" :through-broker true}])
+          session (create-session-with facts)
+          [{result :?eligible}] (query session eligible?)]
+      (is (empty? result))))
 
   (testing "the business hasn't been active for years"
     (let [facts (derive-facts-from [{:name "Soren Kierkegaard" :is-dormant true :docs [:turnover :bank-statement :valid-loan-amount-requested :no-exposure]}])
